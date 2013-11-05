@@ -274,7 +274,7 @@
 {
 	[self updateScrollViewContentSize]; // Set content size
 
-	[self showDocumentPage:[document.pageNumber integerValue]];
+	[self showDocumentPage:1];
 
 	document.lastOpen = [NSDate date]; // Update last opened date
 
