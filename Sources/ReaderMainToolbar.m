@@ -85,7 +85,7 @@
 
 		UIButton *doneButton = [UIButton buttonWithType:UIButtonTypeCustom];
 
-		doneButton.frame = CGRectMake(leftButtonX, BUTTON_Y, DONE_BUTTON_WIDTH, BUTTON_HEIGHT);
+		doneButton.frame = CGRectMake(0, 0, DONE_BUTTON_WIDTH + 30, BUTTON_HEIGHT + 20);
 //        doneButton.frame = CGRectMake(0, 0, (imageN.size.width *2), (imageN.size.height *2));
 
 //		[doneButton setTitle:NSLocalizedString(@"Done", @"button") forState:UIControlStateNormal];
@@ -93,7 +93,9 @@
 //		[doneButton setTitleColor:[UIColor colorWithWhite:1.0f alpha:1.0f] forState:UIControlStateHighlighted];
 		[doneButton addTarget:self action:@selector(doneButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
 //		[doneButton setBackgroundImage:buttonH forState:UIControlStateHighlighted];
-		[doneButton setBackgroundImage:imageN forState:UIControlStateNormal];
+		[doneButton setImage:imageN forState:UIControlStateNormal];
+        [doneButton setImageEdgeInsets:UIEdgeInsetsMake(12.5, 15.0, 7.0, 15.0)];
+
 //		doneButton.titleLabel.font = [UIFont systemFontOfSize:14.0f];
 //		doneButton.autoresizingMask = UIViewAutoresizingNone;
 //		doneButton.exclusiveTouch = YES;
