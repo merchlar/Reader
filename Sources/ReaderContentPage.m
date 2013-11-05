@@ -152,9 +152,12 @@
 		for (NSInteger index = 0; index < count; index++) // Iterate through all annotations
 		{
 			CGPDFDictionaryRef annotationDictionary = NULL; // PDF annotation dictionary
+            
 
 			if (CGPDFArrayGetDictionary(pageAnnotations, index, &annotationDictionary) == true)
 			{
+
+                
 				const char *annotationSubtype = NULL; // PDF annotation subtype string
 
 				if (CGPDFDictionaryGetName(annotationDictionary, "Subtype", &annotationSubtype) == true)

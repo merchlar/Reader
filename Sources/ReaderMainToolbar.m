@@ -39,12 +39,12 @@
 
 #pragma mark Constants
 
-#define BUTTON_X 8.0f
-#define BUTTON_Y 8.0f
+#define BUTTON_X 15.0f
+#define BUTTON_Y 15.0f
 #define BUTTON_SPACE 8.0f
-#define BUTTON_HEIGHT 30.0f
+#define BUTTON_HEIGHT 16.0f
 
-#define DONE_BUTTON_WIDTH 56.0f
+#define DONE_BUTTON_WIDTH 24.0f
 #define THUMBS_BUTTON_WIDTH 40.0f
 #define PRINT_BUTTON_WIDTH 40.0f
 #define EMAIL_BUTTON_WIDTH 40.0f
@@ -72,7 +72,7 @@
 		CGFloat viewWidth = self.bounds.size.width;
 
 		UIImage *imageH = [UIImage imageNamed:@"Reader-Button-H"];
-		UIImage *imageN = [UIImage imageNamed:@"Reader-Button-N"];
+		UIImage *imageN = [UIImage imageNamed:@"back-btn.png"];
 
 		UIImage *buttonH = [imageH stretchableImageWithLeftCapWidth:5 topCapHeight:0];
 		UIImage *buttonN = [imageN stretchableImageWithLeftCapWidth:5 topCapHeight:0];
@@ -86,15 +86,17 @@
 		UIButton *doneButton = [UIButton buttonWithType:UIButtonTypeCustom];
 
 		doneButton.frame = CGRectMake(leftButtonX, BUTTON_Y, DONE_BUTTON_WIDTH, BUTTON_HEIGHT);
-		[doneButton setTitle:NSLocalizedString(@"Done", @"button") forState:UIControlStateNormal];
-		[doneButton setTitleColor:[UIColor colorWithWhite:0.0f alpha:1.0f] forState:UIControlStateNormal];
-		[doneButton setTitleColor:[UIColor colorWithWhite:1.0f alpha:1.0f] forState:UIControlStateHighlighted];
+//        doneButton.frame = CGRectMake(0, 0, (imageN.size.width *2), (imageN.size.height *2));
+
+//		[doneButton setTitle:NSLocalizedString(@"Done", @"button") forState:UIControlStateNormal];
+//		[doneButton setTitleColor:[UIColor colorWithWhite:0.0f alpha:1.0f] forState:UIControlStateNormal];
+//		[doneButton setTitleColor:[UIColor colorWithWhite:1.0f alpha:1.0f] forState:UIControlStateHighlighted];
 		[doneButton addTarget:self action:@selector(doneButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
-		[doneButton setBackgroundImage:buttonH forState:UIControlStateHighlighted];
-		[doneButton setBackgroundImage:buttonN forState:UIControlStateNormal];
-		doneButton.titleLabel.font = [UIFont systemFontOfSize:14.0f];
-		doneButton.autoresizingMask = UIViewAutoresizingNone;
-		doneButton.exclusiveTouch = YES;
+//		[doneButton setBackgroundImage:buttonH forState:UIControlStateHighlighted];
+		[doneButton setBackgroundImage:imageN forState:UIControlStateNormal];
+//		doneButton.titleLabel.font = [UIFont systemFontOfSize:14.0f];
+//		doneButton.autoresizingMask = UIViewAutoresizingNone;
+//		doneButton.exclusiveTouch = YES;
 
 		[self addSubview:doneButton]; leftButtonX += (DONE_BUTTON_WIDTH + BUTTON_SPACE);
 
@@ -212,12 +214,14 @@
 			titleLabel.autoresizingMask = UIViewAutoresizingFlexibleWidth;
 			titleLabel.baselineAdjustment = UIBaselineAdjustmentAlignCenters;
 			titleLabel.textColor = [UIColor colorWithWhite:0.0f alpha:1.0f];
+            titleLabel.textColor = [UIColor whiteColor];
 			titleLabel.shadowColor = [UIColor colorWithWhite:0.65f alpha:1.0f];
 			titleLabel.backgroundColor = [UIColor clearColor];
 			titleLabel.shadowOffset = CGSizeMake(0.0f, 1.0f);
 			titleLabel.adjustsFontSizeToFitWidth = YES;
 			titleLabel.minimumScaleFactor = 0.75f;
-			titleLabel.text = [object.fileName stringByDeletingPathExtension];
+//			titleLabel.text = [object.fileName stringByDeletingPathExtension];
+			titleLabel.text = @"";
 
 			[self addSubview:titleLabel]; 
 		}
@@ -267,20 +271,20 @@
 
 - (void)hideToolbar
 {
-	if (self.hidden == NO)
-	{
-		[UIView animateWithDuration:0.25 delay:0.0
-			options:UIViewAnimationOptionCurveLinear | UIViewAnimationOptionAllowUserInteraction
-			animations:^(void)
-			{
-				self.alpha = 0.0f;
-			}
-			completion:^(BOOL finished)
-			{
-				self.hidden = YES;
-			}
-		];
-	}
+//	if (self.hidden == NO)
+//	{
+//		[UIView animateWithDuration:0.25 delay:0.0
+//			options:UIViewAnimationOptionCurveLinear | UIViewAnimationOptionAllowUserInteraction
+//			animations:^(void)
+//			{
+//				self.alpha = 0.0f;
+//			}
+//			completion:^(BOOL finished)
+//			{
+//				self.hidden = YES;
+//			}
+//		];
+//	}
 }
 
 - (void)showToolbar

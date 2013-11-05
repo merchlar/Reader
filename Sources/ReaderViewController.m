@@ -1,6 +1,6 @@
 //
 //	ReaderViewController.m
-//	Reader v2.7.2
+//	Reader v2.6.0
 //
 //	Created by Julius Oklamcak on 2011-07-01.
 //	Copyright © 2011-2013 Julius Oklamcak. All rights reserved.
@@ -31,6 +31,7 @@
 #import "ReaderContentView.h"
 #import "ReaderThumbCache.h"
 #import "ReaderThumbQueue.h"
+#import "SVWebViewController.h"
 
 #import <MessageUI/MessageUI.h>
 
@@ -315,46 +316,50 @@
 
 	self.view.backgroundColor = [UIColor grayColor]; // Neutral gray
 
-	CGRect scrollViewRect = self.view.bounds; UIView *fakeStatusBar = nil;
+	CGRect viewRect = self.view.bounds; // View controller's view bounds
 
-	if ([self respondsToSelector:@selector(edgesForExtendedLayout)]) // iOS 7+
+	if ([self respondsToSelector:@selector(edgesForExtendedLayout)])
 	{
 		if ([self prefersStatusBarHidden] == NO) // Visible status bar
 		{
-			CGRect statusBarRect = self.view.bounds; // Status bar frame
-			statusBarRect.size.height = STATUS_HEIGHT; // Default status height
-			fakeStatusBar = [[UIView alloc] initWithFrame:statusBarRect]; // UIView
-			fakeStatusBar.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-			fakeStatusBar.backgroundColor = [UIColor blackColor];
-			fakeStatusBar.contentMode = UIViewContentModeRedraw;
-			fakeStatusBar.userInteractionEnabled = NO;
-
-			scrollViewRect.origin.y += STATUS_HEIGHT; scrollViewRect.size.height -= STATUS_HEIGHT;
+			viewRect.origin.y += STATUS_HEIGHT;
 		}
 	}
 
-	theScrollView = [[UIScrollView alloc] initWithFrame:scrollViewRect]; // UIScrollView
-	theScrollView.autoresizesSubviews = NO; theScrollView.contentMode = UIViewContentModeRedraw;
-	theScrollView.showsHorizontalScrollIndicator = NO; theScrollView.showsVerticalScrollIndicator = NO;
-	theScrollView.scrollsToTop = NO; theScrollView.delaysContentTouches = NO; theScrollView.pagingEnabled = YES;
+	theScrollView = [[UIScrollView alloc] initWithFrame:viewRect]; // All
+
+	theScrollView.scrollsToTop = NO;
+	theScrollView.pagingEnabled = YES;
+	theScrollView.delaysContentTouches = NO;
+	theScrollView.showsVerticalScrollIndicator = NO;
+	theScrollView.showsHorizontalScrollIndicator = NO;
+	theScrollView.contentMode = UIViewContentModeRedraw;
 	theScrollView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-	theScrollView.backgroundColor = [UIColor clearColor]; theScrollView.delegate = self;
+	theScrollView.backgroundColor = [UIColor clearColor];
+	theScrollView.userInteractionEnabled = YES;
+	theScrollView.autoresizesSubviews = NO;
+	theScrollView.delegate = self;
+
 	[self.view addSubview:theScrollView];
 
-	CGRect toolbarRect = scrollViewRect; // Toolbar frame
-	toolbarRect.size.height = TOOLBAR_HEIGHT; // Default toolbar height
-	mainToolbar = [[ReaderMainToolbar alloc] initWithFrame:toolbarRect document:document]; // ReaderMainToolbar
-	mainToolbar.delegate = self; // ReaderMainToolbarDelegate
+	CGRect toolbarRect = viewRect;
+	toolbarRect.size.height = TOOLBAR_HEIGHT;
+
+	mainToolbar = [[ReaderMainToolbar alloc] initWithFrame:toolbarRect document:document]; // At top
+    
+	mainToolbar.delegate = self;
+
 	[self.view addSubview:mainToolbar];
 
-	CGRect pagebarRect = self.view.bounds;; // Pagebar frame
-	pagebarRect.origin.y = (pagebarRect.size.height - PAGEBAR_HEIGHT);
-	pagebarRect.size.height = PAGEBAR_HEIGHT; // Default pagebar height
-	mainPagebar = [[ReaderMainPagebar alloc] initWithFrame:pagebarRect document:document]; // ReaderMainPagebar
-	mainPagebar.delegate = self; // ReaderMainPagebarDelegate
-	[self.view addSubview:mainPagebar];
+	CGRect pagebarRect = viewRect;
+	pagebarRect.size.height = PAGEBAR_HEIGHT;
+	pagebarRect.origin.y = (viewRect.size.height - PAGEBAR_HEIGHT);
 
-	if (fakeStatusBar != nil) [self.view addSubview:fakeStatusBar]; // Add status bar background view
+	mainPagebar = [[ReaderMainPagebar alloc] initWithFrame:pagebarRect document:document]; // At bottom
+
+	mainPagebar.delegate = self;
+
+	[self.view addSubview:mainPagebar];
 
 	UITapGestureRecognizer *singleTapOne = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleSingleTap:)];
 	singleTapOne.numberOfTouchesRequired = 1; singleTapOne.numberOfTapsRequired = 1; singleTapOne.delegate = self;
@@ -371,11 +376,49 @@
 	[singleTapOne requireGestureRecognizerToFail:doubleTapOne]; // Single tap requires double tap to fail
 
 	contentViews = [NSMutableDictionary new]; lastHideTime = [NSDate date];
+    
+    UIButton * infoButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    infoButton.frame = self.view.frame;
+//    infoButton.imageView.image = [UIImage imageNamed:@"magazine-info-popup"];
+    if  ((UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) &&
+         ([UIScreen mainScreen].bounds.size.height > 480.0f)) {
+        [infoButton setBackgroundImage:[UIImage imageNamed:@"magazine-info-popup-iphone5"] forState:UIControlStateNormal];
+        [infoButton setBackgroundImage:[UIImage imageNamed:@"magazine-info-popup-iphone5"] forState:UIControlStateHighlighted];
+        [infoButton setBackgroundImage:[UIImage imageNamed:@"magazine-info-popup-iphone5"] forState:UIControlStateSelected];
+    }
+    else {
+        [infoButton setBackgroundImage:[UIImage imageNamed:@"magazine-info-popup"] forState:UIControlStateNormal];
+        [infoButton setBackgroundImage:[UIImage imageNamed:@"magazine-info-popup"] forState:UIControlStateHighlighted];
+        [infoButton setBackgroundImage:[UIImage imageNamed:@"magazine-info-popup"] forState:UIControlStateSelected];
+    }
+    [infoButton addTarget:self action:@selector(touchInfo:) forControlEvents:UIControlEventTouchUpInside];
+    infoButton.adjustsImageWhenDisabled = NO;
+    [self.view addSubview:infoButton];
+}
+
+- (void)touchInfo:(id)sender {
+    NSLog(@"touchInfo");
+    
+    [sender setHighlighted:NO];
+    [sender setSelected:NO];
+
+    
+    [UIView animateWithDuration:1.0
+                          delay:0.0
+                        options:UIViewAnimationOptionCurveEaseInOut
+                     animations:^{
+                         [sender setAlpha:0.0];
+                     }
+                     completion:^(BOOL finished){
+                     }];
 }
 
 - (void)viewWillAppear:(BOOL)animated
 {
 	[super viewWillAppear:animated];
+    
+    [self.navigationController setNavigationBarHidden:YES animated:NO];
+
 
 	if (CGSizeEqualToSize(lastAppearSize, CGSizeZero) == false)
 	{
@@ -587,7 +630,7 @@
 
 		CGRect areaRect = CGRectInset(viewRect, TAP_AREA_SIZE, 0.0f); // Area
 
-		if (CGRectContainsPoint(areaRect, point)) // Single tap is inside the area
+		if (CGRectContainsPoint(viewRect, point)) // Single tap is inside the area
 		{
 			NSInteger page = [document.pageNumber integerValue]; // Current page #
 
@@ -614,13 +657,21 @@
 							url = [NSURL URLWithString:http]; // Proper http-based URL
 						}
 					}
+                    
 
-					if ([[UIApplication sharedApplication] openURL:url] == NO)
-					{
-						#ifdef DEBUG
-							NSLog(@"%s '%@'", __FUNCTION__, url); // Bad or unknown URL
-						#endif
-					}
+                    SVWebViewController *webViewController = [[SVWebViewController alloc] initWithURL:url];
+                    
+                    // uncomment the following line to set bar tint color under iOS 7
+                    //self.navigationController.navigationBar.barTintColor = [UIColor redColor];
+                    [self.navigationController pushViewController:webViewController animated:YES];
+                    [self.navigationController setNavigationBarHidden:NO animated:NO];
+
+//					if ([[UIApplication sharedApplication] openURL:url] == NO)
+//					{
+//						#ifdef DEBUG
+//							NSLog(@"%s '%@'", __FUNCTION__, url); // Bad or unknown URL
+//						#endif
+//					}
 				}
 				else // Not a URL, so check for other possible object type
 				{
@@ -646,22 +697,22 @@
 			return;
 		}
 
-		CGRect nextPageRect = viewRect;
-		nextPageRect.size.width = TAP_AREA_SIZE;
-		nextPageRect.origin.x = (viewRect.size.width - TAP_AREA_SIZE);
-
-		if (CGRectContainsPoint(nextPageRect, point)) // page++ area
-		{
-			[self incrementPageNumber]; return;
-		}
-
-		CGRect prevPageRect = viewRect;
-		prevPageRect.size.width = TAP_AREA_SIZE;
-
-		if (CGRectContainsPoint(prevPageRect, point)) // page-- area
-		{
-			[self decrementPageNumber]; return;
-		}
+//		CGRect nextPageRect = viewRect;
+//		nextPageRect.size.width = TAP_AREA_SIZE;
+//		nextPageRect.origin.x = (viewRect.size.width - TAP_AREA_SIZE);
+//
+//		if (CGRectContainsPoint(nextPageRect, point)) // page++ area
+//		{
+//			[self incrementPageNumber]; return;
+//		}
+//
+//		CGRect prevPageRect = viewRect;
+//		prevPageRect.size.width = TAP_AREA_SIZE;
+//
+//		if (CGRectContainsPoint(prevPageRect, point)) // page-- area
+//		{
+//			[self decrementPageNumber]; return;
+//		}
 	}
 }
 

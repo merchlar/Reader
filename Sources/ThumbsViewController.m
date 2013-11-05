@@ -1,6 +1,6 @@
 //
 //	ThumbsViewController.m
-//	Reader v2.7.2
+//	Reader v2.6.1
 //
 //	Created by Julius Oklamcak on 2011-09-01.
 //	Copyright © 2011-2013 Julius Oklamcak. All rights reserved.
@@ -94,53 +94,50 @@
 
 	self.view.backgroundColor = [UIColor grayColor]; // Neutral gray
 
-	CGRect scrollViewRect = self.view.bounds; UIView *fakeStatusBar = nil;
+	CGRect viewRect = self.view.bounds; // View controller's view bounds
 
-	if ([self respondsToSelector:@selector(edgesForExtendedLayout)]) // iOS 7+
+	if ([self respondsToSelector:@selector(edgesForExtendedLayout)])
 	{
 		if ([self prefersStatusBarHidden] == NO) // Visible status bar
 		{
-			CGRect statusBarRect = self.view.bounds; // Status bar frame
-			statusBarRect.size.height = STATUS_HEIGHT; // Default status height
-			fakeStatusBar = [[UIView alloc] initWithFrame:statusBarRect]; // UIView
-			fakeStatusBar.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-			fakeStatusBar.backgroundColor = [UIColor blackColor];
-			fakeStatusBar.contentMode = UIViewContentModeRedraw;
-			fakeStatusBar.userInteractionEnabled = NO;
-
-			scrollViewRect.origin.y += STATUS_HEIGHT; scrollViewRect.size.height -= STATUS_HEIGHT;
+			viewRect.origin.y += STATUS_HEIGHT;
 		}
 	}
 
 	NSString *toolbarTitle = [document.fileName stringByDeletingPathExtension];
 
-	CGRect toolbarRect = scrollViewRect; // Toolbar frame
-	toolbarRect.size.height = TOOLBAR_HEIGHT; // Default toolbar height
-	mainToolbar = [[ThumbsMainToolbar alloc] initWithFrame:toolbarRect title:toolbarTitle]; // ThumbsMainToolbar
-	mainToolbar.delegate = self; // ThumbsMainToolbarDelegate
+	CGRect toolbarRect = viewRect; toolbarRect.size.height = TOOLBAR_HEIGHT;
+
+	mainToolbar = [[ThumbsMainToolbar alloc] initWithFrame:toolbarRect title:toolbarTitle]; // At top
+
+	mainToolbar.delegate = self;
+
 	[self.view addSubview:mainToolbar];
 
-	if (fakeStatusBar != nil) [self.view addSubview:fakeStatusBar]; // Add status bar background view
+	CGRect thumbsRect = viewRect; UIEdgeInsets insets = UIEdgeInsetsZero;
 
-	UIEdgeInsets scrollViewInsets = UIEdgeInsetsZero; // Scroll view toolbar insets
-
-	if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) // iPad
+	if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad)
 	{
-		scrollViewRect.origin.y += TOOLBAR_HEIGHT; scrollViewRect.size.height -= TOOLBAR_HEIGHT;
+		thumbsRect.origin.y += TOOLBAR_HEIGHT; thumbsRect.size.height -= TOOLBAR_HEIGHT;
 	}
 	else // Set UIScrollView insets for non-UIUserInterfaceIdiomPad case
 	{
-		scrollViewInsets.top = TOOLBAR_HEIGHT;
+		insets.top = TOOLBAR_HEIGHT;
 	}
 
-	theThumbsView = [[ReaderThumbsView alloc] initWithFrame:scrollViewRect]; // ReaderThumbsView
-	theThumbsView.contentInset = scrollViewInsets; theThumbsView.scrollIndicatorInsets = scrollViewInsets;
-	theThumbsView.delegate = self; // ReaderThumbsViewDelegate
+	theThumbsView = [[ReaderThumbsView alloc] initWithFrame:thumbsRect]; // Rest
+
+	theThumbsView.contentInset = insets; theThumbsView.scrollIndicatorInsets = insets;
+
+	theThumbsView.delegate = self;
+
 	[self.view insertSubview:theThumbsView belowSubview:mainToolbar];
 
 	BOOL large = ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad);
-	CGFloat thumbSize = (large ? PAGE_THUMB_LARGE : PAGE_THUMB_SMALL); // Thumb dimensions
-	[theThumbsView setThumbSize:CGSizeMake(thumbSize, thumbSize)]; // Set the thumb size
+
+	NSInteger thumbSize = (large ? PAGE_THUMB_LARGE : PAGE_THUMB_SMALL); // Thumb dimensions
+
+	[theThumbsView setThumbSize:CGSizeMake(thumbSize, thumbSize)]; // Thumb size based on device
 }
 
 - (void)viewWillAppear:(BOOL)animated

@@ -147,8 +147,8 @@
 		self.backgroundColor = [UIColor clearColor];
 
 		CAGradientLayer *layer = (CAGradientLayer *)self.layer;
-		UIColor *liteColor = [UIColor colorWithWhite:0.82f alpha:0.8f];
-		UIColor *darkColor = [UIColor colorWithWhite:0.32f alpha:0.8f];
+		UIColor *liteColor = [UIColor colorWithRed:0.168627F green:0.235294F blue:0.517647F alpha:0.8F];
+		UIColor *darkColor = [UIColor colorWithRed:0.168627F green:0.235294F blue:0.517647F alpha:0.8F];
 		layer.colors = [NSArray arrayWithObjects:(id)liteColor.CGColor, (id)darkColor.CGColor, nil];
 
 		CGRect shadowRect = self.bounds; shadowRect.size.height = 4.0f; shadowRect.origin.y -= shadowRect.size.height;
@@ -190,7 +190,7 @@
 
 		[pageNumberView addSubview:pageNumberLabel]; // Add label view
 
-		[self addSubview:pageNumberView]; // Add page numbers display view
+		//[self addSubview:pageNumberView]; // Add page numbers display view
 
 		trackControl = [[ReaderTrackControl alloc] initWithFrame:self.bounds]; // Track control view
 
@@ -333,20 +333,20 @@
 
 - (void)hidePagebar
 {
-	if (self.hidden == NO) // Only if visible
-	{
-		[UIView animateWithDuration:0.25 delay:0.0
-			options:UIViewAnimationOptionCurveLinear | UIViewAnimationOptionAllowUserInteraction
-			animations:^(void)
-			{
-				self.alpha = 0.0f;
-			}
-			completion:^(BOOL finished)
-			{
-				self.hidden = YES;
-			}
-		];
-	}
+//	if (self.hidden == NO) // Only if visible
+//	{
+//		[UIView animateWithDuration:0.25 delay:0.0
+//			options:UIViewAnimationOptionCurveLinear | UIViewAnimationOptionAllowUserInteraction
+//			animations:^(void)
+//			{
+//				self.alpha = 0.0f;
+//			}
+//			completion:^(BOOL finished)
+//			{
+//				self.hidden = YES;
+//			}
+//		];
+//	}
 }
 
 - (void)showPagebar
@@ -563,7 +563,7 @@
 		CGFloat value = (small ? 0.6f : 0.7f); // Size based alpha value
 
 		UIColor *background = [UIColor colorWithWhite:0.8f alpha:value];
-
+        
 		self.backgroundColor = background; imageView.backgroundColor = background;
 
 		imageView.layer.borderColor = [UIColor colorWithWhite:0.4f alpha:0.6f].CGColor;

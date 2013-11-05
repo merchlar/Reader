@@ -55,8 +55,8 @@
 		CAGradientLayer *layer = (CAGradientLayer *)self.layer;
 		UIColor *liteColor = [UIColor colorWithWhite:0.92f alpha:0.8f];
 		UIColor *darkColor = [UIColor colorWithWhite:0.32f alpha:0.8f];
-		layer.colors = [NSArray arrayWithObjects:(id)liteColor.CGColor, (id)darkColor.CGColor, nil];
-
+//		layer.colors = [NSArray arrayWithObjects:(id)liteColor.CGColor, (id)darkColor.CGColor, nil];
+        layer.backgroundColor = [UIColor colorWithRed:0.168627F green:0.235294F blue:0.517647F alpha:0.8F].CGColor;
 		CGRect shadowRect = self.bounds; shadowRect.origin.y += shadowRect.size.height; shadowRect.size.height = SHADOW_HEIGHT;
 
 		UIXToolbarShadow *shadowView = [[UIXToolbarShadow alloc] initWithFrame:shadowRect];
