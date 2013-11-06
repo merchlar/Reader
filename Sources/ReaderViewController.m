@@ -32,6 +32,7 @@
 #import "ReaderThumbCache.h"
 #import "ReaderThumbQueue.h"
 #import "SVWebViewController.h"
+#import "Flurry.h"
 
 #import <MessageUI/MessageUI.h>
 
@@ -658,6 +659,7 @@
 						}
 					}
                     
+                    [Flurry logEvent:@"WINTER_MAGAZINE_WEBVIEW"];
 
                     SVWebViewController *webViewController = [[SVWebViewController alloc] initWithURL:url];
                     
